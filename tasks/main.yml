@@ -37,7 +37,7 @@
   community.windows.win_domain_user:
     name: '{{ current_user }}'
     spn_action: '{{ spn_action }}'
-    spn: 
+    spn:
       - '{{ spn_services | random }}/{{ domain_computers | random }}'
       - '{{ spn_services | random }}/{{ domain_computers | random }}@{{ domain_name }}'
   loop: '{{ kerberoastable_users }}'
