@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  role_name: ad_kerberoasting
+  author: xbufu
+  description: AD Kerberoasting role.
+  company: Bufu-Security
+  license: license (BSD, MIT)
+  min_ansible_version: "2.1"
+  platforms:
+    - name: Windows
+      versions: all
+
+  galaxy_tags:
+    - windows
+    - ad
+    - vulnerable_domain
+    - kerberoasting

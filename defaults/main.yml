@@ -1,0 +1,10 @@
+---
+num_kerberoastable_users: 1
+spn_services:
+  - https
+  - ftp
+  - CIFS
+  - kafka
+  - MSSQL
+  - POP3
+spn_action: add

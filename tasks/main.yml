@@ -1,0 +1,45 @@
+---
+- name: Get all domain users
+  ansible.windows.win_powershell:
+    script: |
+      Get-ADUser -Filter * | Select -Exp SamAccountName
+  register: users_result
+
+- name: Parse the user result to a list
+  ansible.builtin.set_fact:
+    domain_users: "{{ users_result.output | reject('search', 'Administrator') | reject('search', 'krbtgt') | reject('search', 'Guest') | list }}"
+
+- name: Get {{ num_kerberoastable_users }} random users
+  ansible.builtin.set_fact:
+    kerberoastable_users: "{{ (domain_users | shuffle)[:num_kerberoastable_users] }}"
+
+- name: Get all domain computers
+  ansible.windows.win_powershell:
+    script: |
+      Get-ADComputer -Filter * | Select -Exp Name
+  register: computers_result
+
+- name: Parse the computer result to a list
+  ansible.builtin.set_fact:
+    domain_computers: "{{ computers_result.output | list }}"
+
+- name: Get current domain
+  ansible.windows.win_powershell:
+    script: |
+      (Get-ADDomain).Forest
+  register: domain_result
+
+- name: Set domain fact
+  ansible.builtin.set_fact:
+    domain_name: '{{ domain_result.output[0] }}'
+
+- name: Set random SPNs
+  community.windows.win_domain_user:
+    name: '{{ current_user }}'
+    spn_action: '{{ spn_action }}'
+    spn: 
+      - '{{ spn_services | random }}/{{ domain_computers | random }}'
+      - '{{ spn_services | random }}/{{ domain_computers | random }}@{{ domain_name }}'
+  loop: '{{ kerberoastable_users }}'
+  loop_control:
+    loop_var: current_user
